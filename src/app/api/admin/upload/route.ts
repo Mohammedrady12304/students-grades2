@@ -61,10 +61,20 @@ export async function POST(req: Request) {
     })),
   );
 
-  await prisma.$transaction(async (tx) => {
-    await tx.student.deleteMany();
-    await tx.student.createMany({ data: hashed });
-  });
+  try {
+    await prisma.$transaction(async (tx) => {
+      await tx.student.deleteMany();
+      await tx.student.createMany({ data: hashed });
+    });
+  } catch (e) {
+    console.error("[admin/upload]", e);
+    const message = e instanceof Error ? e.message : "Database error during upload.";
+    const schemaHint =
+      /column|grade|grades|does not exist|Unknown arg/i.test(message)
+        ? " If you recently changed the app schema, run the SQL in prisma/manual-revert-single-grade.sql on your database (or prisma migrate deploy if you use migrations)."
+        : "";
+    return NextResponse.json({ error: message + schemaHint }, { status: 500 });
+  }
 
   return NextResponse.json({ ok: true, count: hashed.length });
 }
