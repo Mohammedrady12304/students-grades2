@@ -212,7 +212,7 @@ export default function AdminPage() {
 
         <p className="mt-8 text-center text-sm text-[var(--muted)]">
           <Link href="/" className="text-[var(--accent)] hover:underline">
-            Student login
+            Student Login
           </Link>
         </p>
       </div>
