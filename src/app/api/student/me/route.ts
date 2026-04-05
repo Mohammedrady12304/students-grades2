@@ -12,12 +12,12 @@ export async function GET() {
 
   const student = await prisma.student.findUnique({
     where: { id: session.studentId },
-    select: { username: true, grade: true },
+    select: { username: true, grades: true },
   });
 
   if (!student) {
     return NextResponse.json({ error: "Session invalid" }, { status: 401 });
   }
 
-  return NextResponse.json({ username: student.username, grade: student.grade });
+  return NextResponse.json({ username: student.username, grades: student.grades });
 }

@@ -10,7 +10,7 @@ export default async function StudentDashboardPage() {
 
   const student = await prisma.student.findUnique({
     where: { id: session.studentId },
-    select: { username: true, grade: true },
+    select: { username: true, grades: true },
   });
 
   if (!student) redirect("/");
@@ -21,9 +21,16 @@ export default async function StudentDashboardPage() {
         <p className="text-sm text-[var(--muted)]">Signed in as</p>
         <p className="text-lg font-semibold">{student.username}</p>
 
-        <div className="mt-8 rounded-xl border border-[var(--border)] bg-[var(--bg)] p-6 text-center">
-          <p className="text-sm uppercase tracking-wide text-[var(--muted)]">Your grade</p>
-          <p className="mt-2 text-4xl font-bold text-[var(--success)]">{student.grade}</p>
+        <div className="mt-8 rounded-xl border border-[var(--border)] bg-[var(--bg)] p-6">
+          <p className="text-sm uppercase tracking-wide text-[var(--muted)]">Your grades</p>
+          <div className="mt-2 space-y-2">
+            {Object.entries(student.grades || {}).map(([subject, grade]) => (
+              <div key={subject} className="flex justify-between">
+                <span className="text-sm font-medium">{subject}</span>
+                <span className="text-lg font-bold text-[var(--success)]">{grade}</span>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-between">

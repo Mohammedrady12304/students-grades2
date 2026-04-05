@@ -53,11 +53,12 @@ export async function POST(req: Request) {
   }
 
   const rounds = 10;
+
   const hashed = await Promise.all(
     rows.map(async (r) => ({
       username: r.username,
       passwordHash: await bcrypt.hash(r.password, rounds),
-      grade: r.grade,
+      grades: r.grades, // ✅ بدل grade
     })),
   );
 
@@ -69,10 +70,12 @@ export async function POST(req: Request) {
   } catch (e) {
     console.error("[admin/upload]", e);
     const message = e instanceof Error ? e.message : "Database error during upload.";
+
     const schemaHint =
       /column|grade|grades|does not exist|Unknown arg/i.test(message)
-        ? " If you recently changed the app schema, run the SQL in prisma/manual-revert-single-grade.sql on your database (or prisma migrate deploy if you use migrations)."
+        ? " تأكد إنك عملت migration بعد تعديل schema (grades بدل grade)."
         : "";
+
     return NextResponse.json({ error: message + schemaHint }, { status: 500 });
   }
 
